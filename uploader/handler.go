@@ -1,5 +1,4 @@
-package main
-
+package uploader
 import (
 	"crypto/sha256"
 	"encoding/hex"
@@ -13,7 +12,7 @@ import (
 
 //isse with this is it buffers the file in memory
 // large file stored in temporary files avoiding IO overhead
-func uploadHandler(w http.ResponseWriter, r *http.Request){
+func UploadHandler(w http.ResponseWriter, r *http.Request){
 	fmt.Println("Entering into file uploading")
 	//parse our multipart form so that max limit of file is 10 MB
 	//bitwise left--10*2^20--2^20--1 MB--10 MB
@@ -50,7 +49,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request){
 	}
 }
 
-func uploadStreamingHandler(w http.ResponseWriter, r* http.Request){
+func UploadStreamingHandler(w http.ResponseWriter, r* http.Request){
 	fmt.Println("Entering into file uploading using streaming instead of directly putting the file in memory")
 	const MAX_UPLOAD_SIZE = 1<<30 // 1GB max size(1*2^30)
 	const MAX_BUFFER_SIZE = 64<<10 //64 KB (64*2^10)
