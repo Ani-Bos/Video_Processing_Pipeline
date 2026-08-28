@@ -150,9 +150,9 @@ func(c *DefaultFileChunker) ChunkLargeFileChunkFile(filepath string)([]ChunkMeta
 					MD5Hash: hashstring,
 					Index: idx,
 					}
-                    mu.lock()
+                    mu.Lock()
 					chunks = append(chunks, chunk)
-					mu.unlock()
+					mu.Unlock()
 
 					defer nextchunkfile.Close()
 					chunkchan<-chunk
@@ -163,7 +163,7 @@ func(c *DefaultFileChunker) ChunkLargeFileChunkFile(filepath string)([]ChunkMeta
 	}
 	//wait for all goroutine tot finish
 	go func(){
-     wg.wait()
+     wg.Wait()
 	 close(chunkchan)
 	 close(errchan)
 	}()
