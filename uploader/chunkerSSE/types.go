@@ -54,7 +54,7 @@ type UploadStatus struct{
 type UploadResponse struct{
 	UploadId string
 	FileName string
-	size int64
+	Size int64
 	FilePath string
 }
 

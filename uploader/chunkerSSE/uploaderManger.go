@@ -33,9 +33,9 @@ func (m *ChunkedUploadManager) InitiateUpload(req *RequestWrapper) (*ChunkedUplo
 	}
 	//create temp directory path for this upload
 	uploadpath := filepath.Join(m.uploadDir, "chunks", uploadId)
-	err := os.Mkdir(uploadpath, 0755)
+	err := os.MkdirAll(uploadpath, 0755)
 	if err != nil {
-		return uploadSessionchunk, err
+		return nil, err
 	}
 	m.mu.Lock()
 	m.uploads[uploadId] = uploadSessionchunk
@@ -147,6 +147,7 @@ func (m *ChunkedUploadManager) CompleteUpload(UploadId string)(*UploadResponse,e
 		}
 		chunkfile.Close()
 	}
+	//cleanup upload session and remove all chunks
 	os.RemoveAll(chunksdir)
 	m.mu.Lock()
 	delete(m.uploads,UploadId)
@@ -154,7 +155,7 @@ func (m *ChunkedUploadManager) CompleteUpload(UploadId string)(*UploadResponse,e
 	return &UploadResponse{
 		UploadId:UploadId,
 		FileName:uploadedSesssion.FileName,
-		size:uploadedSesssion.TotalSize,
+		Size:uploadedSesssion.TotalSize,
 		FilePath:FinalchunkfilePath,
 	},nil
 }
@@ -167,6 +168,7 @@ func(m *ChunkedUploadManager)GetUploadStatus(UploadId string)(*UploadStatus,erro
 	if !exists {
 		return nil, fmt.Errorf("uploaded session not fountd")
 	}
+	//finding missing chunks
     missingChunks := make([]int,0)
 	m.mu.RLock()
 	for i:=0 ; i<int(uploadedSesssion.TotalChunks);i++{
