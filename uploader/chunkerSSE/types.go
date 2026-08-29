@@ -23,7 +23,7 @@ type ChunkedUpload struct {
 type ChunkedUploadManager struct{
 	uploads map[string]*ChunkedUpload
 	uploadDir string
-	mu sync.Mutex
+	mu sync.RWMutex
 }
 
 //New chunked manager created a new manager for chunked uoloads
@@ -41,9 +41,33 @@ type  RequestWrapper struct{
 	ChunkSize int64
 }
 
+type UploadStatus struct{
+	UploadId string
+	FileName string
+	UploadedChunks int
+    TotalChunks int64
+	MissingChunks []int
+	IsComplete bool
+
+}
+
+type UploadResponse struct{
+	UploadId string
+	FileName string
+	size int64
+	FilePath string
+}
+
+type ChunkAcknowledgemnt struct{
+	ChunkNumber int
+	UploadedChunks int
+	TotalChunks int64
+}
+
 type UploadManager interface{
 	InitiateUpload(req *RequestWrapper)(*ChunkedUpload,error)
-	UploadChunk(uploadId string, chunkNumber int, data io.Reader)(error)
-	CompleteUpload(UploadId string)(*ChunkedUpload,error)
-	GetUploadStatus(UploadId string)(*ChunkedUpload,error)
+	UploadChunk(uploadId string, chunkNumber int, data io.Reader)(*ChunkAcknowledgemnt,error)
+	CompleteUpload(UploadId string)(*UploadResponse,error)
+	GetUploadStatus(UploadId string)(*UploadStatus,error)
 }
+
