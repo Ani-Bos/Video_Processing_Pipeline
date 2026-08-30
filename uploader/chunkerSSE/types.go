@@ -36,9 +36,9 @@ func NewChunkedUploadManager(dir string) * ChunkedUploadManager{
 }
 
 type  RequestWrapper struct{
-	FileName string
-	TotalSize int64
-	ChunkSize int64
+	FileName  string `json:"filename"`
+    TotalSize int64  `json:"total_size"`
+    ChunkSize int64  `json:"chunk_size"`
 }
 
 type UploadStatus struct{

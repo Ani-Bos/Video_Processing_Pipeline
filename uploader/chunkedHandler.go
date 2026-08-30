@@ -22,7 +22,11 @@ func(h *HandlerStruct)HandleStartUpload(w http.ResponseWriter, r *http.Request){
 	fmt.Println("Entering into starting upload session for chunking")
 	var req chunkersse.RequestWrapper
     //validating request
+	fmt.Println(req)
+	fmt.Println(r.Body)
     err:=json.NewDecoder(r.Body).Decode(&req)
+	fmt.Printf("Decode error: %v\n", err)
+    fmt.Printf("Decoded req: %+v\n", req)
 	if err!=nil{
        http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
