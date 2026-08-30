@@ -14,3 +14,13 @@ Uploading chunk 4...
 Uploading chunk 5...
 {"ChunkNumber":5,"UploadedChunks":6,"TotalChunks":6}
 {"UploadId":"84e90d3e1e0a7bea4905e4d029a8b949","FileName":"1080_30_8.00_Jun222021(1).mp4","Size":28857413,"FilePath":"uploads\\1080_30_8.00_Jun222021(1).mp4"}
+
+http://localhost:8080/upload/status?upload_id=34899b39c4948d91fef7ab047c57d8c7
+{
+    "UploadId": "34899b39c4948d91fef7ab047c57d8c7",
+    "FileName": "1080_30_8.00_Jun222021(1).mp4",
+    "UploadedChunks": 6,
+    "TotalChunks": 6,
+    "MissingChunks": [],
+    "IsComplete": true
+}

@@ -149,9 +149,9 @@ func (m *ChunkedUploadManager) CompleteUpload(UploadId string)(*UploadResponse,e
 	}
 	//cleanup upload session and remove all chunks
 	os.RemoveAll(chunksdir)
-	m.mu.Lock()
-	delete(m.uploads,UploadId)
-	m.mu.Unlock()
+	// m.mu.Lock()
+	// delete(m.uploads,UploadId)
+	// m.mu.Unlock()
 	return &UploadResponse{
 		UploadId:UploadId,
 		FileName:uploadedSesssion.FileName,
