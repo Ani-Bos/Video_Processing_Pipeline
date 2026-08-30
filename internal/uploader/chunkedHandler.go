@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"video_processing_pipeline/uploader/chunkersse"
+	"video_processing_pipeline/internal/uploader/chunkersse"
 )
 
 type HandlerStruct struct{

@@ -1,10 +1,11 @@
-package main
+package uploadservice
+
 import (
 	"fmt"
 	"net/http"
 	"log"
-	"video_processing_pipeline/uploader"
-	"video_processing_pipeline/uploader/chunkersse"
+	"video_processing_pipeline/internal/uploader"
+	"video_processing_pipeline/internal/uploader/chunkersse"
 )
 
 func main() {
