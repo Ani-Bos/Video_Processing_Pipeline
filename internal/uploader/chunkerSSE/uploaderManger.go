@@ -186,6 +186,8 @@ func(m *ChunkedUploadManager)GetUploadStatus(UploadId string)(*UploadStatus,erro
 		MissingChunks:missingChunks,
 		IsComplete:len(missingChunks)==0,
 	},nil
+     //all update in db as well
+	//also upload to worker queue i.e redis queue
 	
 }
 
