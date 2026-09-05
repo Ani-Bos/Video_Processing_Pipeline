@@ -158,6 +158,12 @@ func (m *ChunkedUploadManager) CompleteUpload(UploadId string)(*UploadResponse,e
 		Size:uploadedSesssion.TotalSize,
 		FilePath:FinalchunkfilePath,
 	},nil
+  //	FileName string
+	// RawPath string
+	// Status string
+	// Metadata datatypes.JSON
+	//all update in db as well
+	//also upload to worker queue i.e redis queue
 }
 //return the current state oif chunked upload
 //clients determine which chunks need to upload after a failure
@@ -186,8 +192,6 @@ func(m *ChunkedUploadManager)GetUploadStatus(UploadId string)(*UploadStatus,erro
 		MissingChunks:missingChunks,
 		IsComplete:len(missingChunks)==0,
 	},nil
-     //all update in db as well
-	//also upload to worker queue i.e redis queue
 	
 }
 

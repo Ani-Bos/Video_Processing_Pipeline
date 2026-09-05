@@ -1,4 +1,4 @@
-package uploader
+package handler
 
 import (
 	"crypto/sha256"
@@ -39,7 +39,6 @@ func UploadStreamingHandler(w http.ResponseWriter, r* http.Request){
 		if err!=nil{
            http.Error(w,"error reading part",http.StatusBadRequest)
 		   return 
-		return
 		}
 		if next_part.FileName()==""{
 			continue

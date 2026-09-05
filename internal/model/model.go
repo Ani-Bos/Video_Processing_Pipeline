@@ -7,6 +7,7 @@ import (
 
 type Jobs_Database struct {
 	gorm.Model
+	VideoId string
 	FileName string
 	RawPath string
 	Status string

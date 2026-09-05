@@ -1,4 +1,4 @@
-package uploader
+package handler
 import (
 
 	"fmt"

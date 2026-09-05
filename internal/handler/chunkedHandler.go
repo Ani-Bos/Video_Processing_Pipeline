@@ -1,15 +1,18 @@
-package uploader
+package handler
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"video_processing_pipeline/internal/model"
+	"video_processing_pipeline/internal/service"
 	"video_processing_pipeline/internal/uploader/chunkersse"
 )
 
 type HandlerStruct struct{
 	manager chunkersse.UploadManager
+	srvc service.InterfaceInjectRepoJob
 }
 
 func NewHandlerStruct(mgr chunkersse.UploadManager)*HandlerStruct{
@@ -73,6 +76,20 @@ func(h *HandlerStruct) HandleCompleteUpload(w http.ResponseWriter, r *http.Reque
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	//all update in db as well
+	jobsdb := model.Jobs_Database{
+		VideoId: uploadResp.UploadId,
+		FileName: uploadResp.FileName,
+		RawPath: uploadResp.FilePath,
+		Status: "Uploaded",
+
+	}
+	err=h.srvc.Insert(r.Context(),&jobsdb)
+	if err!=nil{
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	//also upload to worker queue i.e redis queue
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(uploadResp)
 }
