@@ -90,6 +90,7 @@ func(h *HandlerStruct) HandleCompleteUpload(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	//also upload to worker queue i.e redis queue
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(uploadResp)
 }
