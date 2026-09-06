@@ -23,7 +23,7 @@ func NewDBManager(repo *repository.ChunkRepo, dir string)*DBManager{
 	}
 }
 
-func (d *DBManager) InitiateUploadDB(req *RequestWrapper) (*ChunkedUpload, error) {
+func (d *DBManager) InitiateUpload(req *RequestWrapper) (*ChunkedUpload, error) {
    ctx:=context.Background()
    total_no_of_chunks := int(req.TotalSize / req.ChunkSize)
 	//like say 105 MB 10 MB so total is 10 chunks
@@ -61,14 +61,14 @@ func (d *DBManager) InitiateUploadDB(req *RequestWrapper) (*ChunkedUpload, error
 	}, nil
 }
 
-func(d *DBManager)UploadChunkDB(uploadId string, chunkNumber int, data io.Reader)(*ChunkAcknowledgemnt,error){
+func(d *DBManager)UploadChunk(uploadId string, chunkNumber int, data io.Reader)(*ChunkAcknowledgemnt,error){
    ctx:=context.Background()
    //find session /chunk by it exist by uploadID
    chunk_ssn,err:=d.repo.FindChunkByUploadID(ctx,uploadId)
    if err!=nil{
 	 return nil,err
    }
-   if chunkNumber < 0 || chunkNumber >= int(chunk_ssn.TotalSize) {
+   if chunkNumber < 0 || chunkNumber >= int(chunk_ssn.TotalChunks) {
 		return nil,fmt.Errorf("Invalid chunk number")
    }
    //check if chunk is already uploaded
@@ -121,7 +121,7 @@ func(d *DBManager)UploadChunkDB(uploadId string, chunkNumber int, data io.Reader
 	},nil
 }
 
-func(d *DBManager)CompleteUploadDB(UploadId string)(*UploadResponse,error){
+func(d *DBManager)CompleteUpload(UploadId string)(*UploadResponse,error){
   ctx:=context.Background()
    //find session /chunk by it exist by uploadID
    chunk_ssn,err:=d.repo.FindChunkByUploadID(ctx,UploadId)
@@ -171,7 +171,7 @@ func(d *DBManager)CompleteUploadDB(UploadId string)(*UploadResponse,error){
 	},nil
 }
  
-func(d *DBManager)GetUploadStatusDB(UploadId string)(*UploadStatus,error){
+func(d *DBManager)GetUploadStatus(UploadId string)(*UploadStatus,error){
   
 	ctx:=context.Background()
    //find session /chunk by it exist by uploadID
