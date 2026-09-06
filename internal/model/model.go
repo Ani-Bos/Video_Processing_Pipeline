@@ -11,5 +11,5 @@ type Jobs_Database struct {
 	FileName string
 	RawPath string
 	Status string
-	Metadata datatypes.JSON
+	Metadata datatypes.JSON `gorm:"type:jsonb"`
 }

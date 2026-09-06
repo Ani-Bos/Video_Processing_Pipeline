@@ -71,3 +71,9 @@ type UploadManager interface{
 	GetUploadStatus(UploadId string)(*UploadStatus,error)
 }
 
+type UploadDBManager interface{
+	InitiateUploadDB(req *RequestWrapper)(*ChunkedUpload,error)
+	UploadChunkDB(uploadId string, chunkNumber int, data io.Reader)(*ChunkAcknowledgemnt,error)
+	CompleteUploadDB(UploadId string)(*UploadResponse,error)
+	GetUploadStatusDB(UploadId string)(*UploadStatus,error)
+}

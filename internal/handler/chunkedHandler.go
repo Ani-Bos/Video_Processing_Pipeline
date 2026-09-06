@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"video_processing_pipeline/internal/model"
+	"video_processing_pipeline/internal/repository"
 	"video_processing_pipeline/internal/service"
 	"video_processing_pipeline/internal/uploader/chunkersse"
 )
@@ -13,6 +14,7 @@ import (
 type HandlerStruct struct{
 	manager chunkersse.UploadManager
 	srvc service.InterfaceInjectRepoJob
+	chunkrepo repository.ChunkRepo
 }
 
 func NewHandlerStruct(mgr chunkersse.UploadManager)*HandlerStruct{
@@ -76,13 +78,14 @@ func(h *HandlerStruct) HandleCompleteUpload(w http.ResponseWriter, r *http.Reque
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+    uploadSession,err:=h.chunkrepo.FindChunkByUploadID(r.Context(),uploadID)
 	//all update in db as well
 	jobsdb := model.Jobs_Database{
 		VideoId: uploadResp.UploadId,
 		FileName: uploadResp.FileName,
 		RawPath: uploadResp.FilePath,
 		Status: "Uploaded",
-
+		Metadata: uploadSession.Metadata, 
 	}
 	err=h.srvc.Insert(r.Context(),&jobsdb)
 	if err!=nil{

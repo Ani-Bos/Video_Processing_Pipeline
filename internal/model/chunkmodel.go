@@ -1,6 +1,9 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"gorm.io/datatypes"
+)
 
 type Chunk_Session struct {
 	gorm.Model
@@ -9,11 +12,11 @@ type Chunk_Session struct {
 	TotalSize      int64
 	ChunkSize      int64
 	TotalChunks    int64
-	UploadedChunks []Chunk `gorm:"foreignKey:UploadID;references:UploadID"`
+	Metadata   datatypes.JSON `gorm:"type:jsonb"`
 }
 
 type Chunk struct{
 	gorm.Model
-	UploadID string `gorm:"index"`
-	Index int
+	UploadID string `gorm:"uniqueIndex:idx_upload_chunk;not null"`
+	Index int `gorm:"uniqueIndex:idx_upload_chunk;not null"`
 }

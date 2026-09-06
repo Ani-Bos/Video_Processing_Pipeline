@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"video_processing_pipeline/internal/model"
-
 	"gorm.io/gorm"
 )
 
@@ -14,38 +13,26 @@ type ChunkRepo struct {
 
 type ChunkUploadManager interface{
 	Create(ctx context.Context,chunkssn *model.Chunk_Session)error
-	FindChunkByID(ctx context.Context, Id uint)(*model.Chunk_Session,error)
 	FindChunkByUploadID(ctx context.Context, uploadID string)(*model.Chunk_Session,error)
 	FindUploadedChunks(ctx context.Context, uploadID string)([]int,error)
 	MarkChunkUploaded(ctx context.Context,uploadID string, chunkIndx int)error
+	GetUploadedCount(ctx context.Context,uploadId string)(int64,error)
 }
 
 func(c *ChunkRepo)Create(ctx context.Context,chunkssn *model.Chunk_Session)error{
 	return c.DB.WithContext(ctx).Create(chunkssn).Error
 }
 
-func(c *ChunkRepo) FindChunkByID(ctx context.Context, Id uint)(*model.Chunk_Session,error){
-	if Id==0{
-		return nil,errors.New("ID cant be null or empty string")
-	}
-	var chunk_ssn *model.Chunk_Session
-	err:=c.DB.WithContext(ctx).First(&chunk_ssn,Id).Error
-	if err!=nil{
-		return nil,err
-	}
-	return chunk_ssn,nil
-}
-
 func(c *ChunkRepo) FindChunkByUploadID(ctx context.Context, uploadId string)(*model.Chunk_Session,error){
 	if uploadId==""{
 		return nil,errors.New("UploadId string cant be empty or null")
 	}
-	var chunk_ssn *model.Chunk_Session
-	err:=c.DB.WithContext(ctx).Preload("UploadedChunks").Where(&model.Chunk_Session{UploadID:uploadId}).First(&chunk_ssn).Error
+	var chunk_ssn model.Chunk_Session
+	err:=c.DB.WithContext(ctx).Where(&model.Chunk_Session{UploadID:uploadId}).First(&chunk_ssn).Error
 	if err!=nil{
 		return nil,err
 	}
-	return chunk_ssn,nil
+	return &chunk_ssn,nil
 }
 
 func(c *ChunkRepo)FindUploadedChunks(ctx context.Context, uploadID string)([]int,error){
@@ -76,4 +63,13 @@ func(c* ChunkRepo)MarkChunkUploaded(ctx context.Context,uploadID string, chunkIn
 		return err
 	}
 	return nil
+}
+
+func(c *ChunkRepo)GetUploadedCount(ctx context.Context,uploadId string)(int64,error){
+	var cnt int64
+	err:=c.DB.Where(&model.Chunk{UploadID: uploadId}).Count(&cnt).Error
+	if err!=nil{
+        return 0,err
+	}
+	return cnt,nil
 }
