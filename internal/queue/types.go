@@ -12,6 +12,7 @@ type JobQueue struct {
 	VideoId   string
 	RawPath  string
 	FileName string
+	OutPutDir   string
 }
 
 type AsyncPublishManager interface {

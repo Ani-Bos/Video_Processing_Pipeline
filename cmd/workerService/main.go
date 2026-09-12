@@ -18,6 +18,7 @@ func main() {
         },
     })
 	mux:=asynq.NewServeMux()
+	// handler1.HandleTranscoding
 	// handler2:=handler1.NewTranscodeHandler()
 	// mux.HandleFunc("/transcode/v1",handler2.HandleTranscoding)
 	// mux.HandleFunc()

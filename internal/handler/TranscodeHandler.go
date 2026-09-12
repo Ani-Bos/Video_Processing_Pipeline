@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"video_processing_pipeline/internal/Transcoder"
 	"video_processing_pipeline/internal/queue"
-
 	"github.com/hibiken/asynq"
 )
 
