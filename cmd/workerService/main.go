@@ -2,7 +2,8 @@ package workerservice
 
 import (
 	"log"
-    "os"
+	"os"
+	handler1 "video_processing_pipeline/internal/Handler"
 	"github.com/hibiken/asynq"
 )
 
@@ -17,7 +18,8 @@ func main() {
         },
     })
 	mux:=asynq.NewServeMux()
-	// mux.HandleFunc()
+	// handler2:=handler1.NewTranscodeHandler()
+	// mux.HandleFunc("/transcode/v1",handler2.HandleTranscoding)
 	// mux.HandleFunc()
 	log.Fatal(srv.Run(mux))
 }
