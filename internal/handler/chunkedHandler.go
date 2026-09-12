@@ -107,7 +107,10 @@ func(h *HandlerStruct) HandleCompleteUpload(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(uploadResp)
+	json.NewEncoder(w).Encode(map[string]string{
+		"upload_id": uploadID,
+		"status": "queued",
+	})
 }
 
 func(h *HandlerStruct) HandleGetStatusUpload(w http.ResponseWriter, r *http.Request){

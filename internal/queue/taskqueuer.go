@@ -12,13 +12,18 @@ type AsyncPublishersrvc struct {
 }
 
 func NewAsyncPublisher(client *asynq.Client) *AsyncPublishersrvc {
-    return &AsyncPublishersrvc{Client: client}
+    return &AsyncPublishersrvc{
+		Client: client,
+	}
 }
 
 func (p *AsyncPublishersrvc)Publish(ctx context.Context,Topic string,job *JobQueue)(error){
 	fmt.Println("Entering into publish events")
-	payload,_:=json.Marshal(job)
-    task:=asynq.NewTask(Topic,payload)
-	_,err:=p.Client.Enqueue(task)
+	payload,err:=json.Marshal(job)
+	if err!=nil{
+		return err
+	}
+    task:=asynq.NewTask(Topic,payload,asynq.MaxRetry(3))
+	_,err=p.Client.Enqueue(task)
 	return err
 }

@@ -27,3 +27,4 @@ func ConnectRedis(){
     }
 	fmt.Println("connected to redis successfully")
 }
+
