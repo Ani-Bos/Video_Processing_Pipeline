@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"video_processing_pipeline/internal/model"
+	"video_processing_pipeline/internal/queue"
 	"video_processing_pipeline/internal/repository"
 	"video_processing_pipeline/internal/service"
 	"video_processing_pipeline/internal/uploader/chunkersse"
@@ -15,6 +16,7 @@ type HandlerStruct struct{
 	manager chunkersse.UploadManager
 	srvc service.InterfaceInjectRepoJob
 	chunkrepo repository.ChunkRepo
+	asyncsrvc queue.AsyncPublishersrvc
 }
 
 func NewHandlerStruct(mgr chunkersse.UploadManager)*HandlerStruct{
@@ -93,7 +95,17 @@ func(h *HandlerStruct) HandleCompleteUpload(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	//also upload to worker queue i.e redis queue
-
+	//using async for publishing queue for transcoding as xadd redis internal implements later
+	JobqueueData := &queue.JobQueue{
+        VideoId: uploadResp.UploadId,
+	    RawPath: uploadResp.FilePath,
+	    FileName: uploadResp.FileName,
+	}
+	err=h.asyncsrvc.Publish(r.Context(),queue.TypeTranscode,JobqueueData)
+	if err!=nil{
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(uploadResp)
 }
