@@ -1,4 +1,4 @@
-package workerservice
+package main
 
 import (
 	"log"
@@ -7,12 +7,11 @@ import (
 	transcoder "video_processing_pipeline/internal/Transcoder"
 	"video_processing_pipeline/internal/handler"
 	"video_processing_pipeline/internal/queue"
-
 	"github.com/hibiken/asynq"
 )
 
 func main() {
-	redis_host:=os.Getenv("REDIS_URL")
+	redis_host:=os.Getenv("REDIS_ADDR")
 	redis_pswd:=os.Getenv("REDIS_PWD")
 	redisoption := asynq.RedisClientOpt{
 		Addr: redis_host,

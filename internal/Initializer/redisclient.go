@@ -9,7 +9,7 @@ import (
 
 func ConnectRedis(){
    fmt.Println("entering into redis initilaizition")
-   redis_host:=os.Getenv("REDIS_URL")
+   redis_host:=os.Getenv("REDIS_PWD")
    if redis_host==""{
 	 redis_host="localhost"
    }

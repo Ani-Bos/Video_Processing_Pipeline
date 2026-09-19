@@ -19,9 +19,13 @@ type HandlerStruct struct{
 	asyncsrvc queue.AsyncPublishersrvc
 }
 
-func NewHandlerStruct(mgr chunkersse.UploadManager)*HandlerStruct{
+func NewHandlerStruct(mgr chunkersse.UploadManager, srvc service.InterfaceInjectRepoJob,
+	chnkrpo repository.ChunkRepo, asyqueu queue.AsyncPublishersrvc)*HandlerStruct{
 	return &HandlerStruct{
       manager: mgr,
+	  srvc: srvc,
+	  chunkrepo: chnkrpo,
+	  asyncsrvc: asyqueu,
 	}
 }
 

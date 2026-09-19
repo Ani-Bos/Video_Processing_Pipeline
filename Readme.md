@@ -66,3 +66,7 @@ http://localhost:8080/upload/status?upload_id=34899b39c4948d91fef7ab047c57d8c7
     "IsComplete": true
 }
 ```
+
+
+docker compose build --no-cache
+docker compose up
