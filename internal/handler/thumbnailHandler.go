@@ -14,10 +14,10 @@ type ThumbnailHandler struct {
 	next queue.AsyncPublishManager
 	thmbnl thumbnail.ThubnailManager
 }
-func NewTHubnailHandler(tsk *queue.AsyncPublishManager, thmb *thumbnail.ThubnailManager)*ThumbnailHandler{
+func NewTHubnailHandler(tsk queue.AsyncPublishManager, thmb thumbnail.ThubnailManager)*ThumbnailHandler{
 	return &ThumbnailHandler{
-		next: *tsk,
-		thmbnl: *thmb,
+		next: tsk,
+		thmbnl: thmb,
 	}
 }
 func(t *ThumbnailHandler)HandleThumbnail(ctx context.Context, task *asynq.Task)error{
@@ -27,7 +27,7 @@ func(t *ThumbnailHandler)HandleThumbnail(ctx context.Context, task *asynq.Task)e
 	if err!=nil{
 		return err
 	}
-    err1:=t.thmbnl.GenerateThumbnail(ctx,&jbq)
+    err1:=t.thmbnl.GenerateThumbnail(ctx,jbq)
 	if err1!=nil{
 		return err1
 	}

@@ -21,7 +21,7 @@ func NewFFMPEG(locn string, dir string) *ffmpeg {
 	}
 }
 
-func (f *ffmpeg) Transcode(ctx context.Context, job queue.JobQueue) error {
+func (f *ffmpeg) Transcode(ctx context.Context, job *queue.JobQueue) error {
 	fmt.Println("Entering into transcoding using ffmpeg and hls format")
 	output_dir:= filepath.Join(f.working_dir,job.VideoId)
 	err:=os.MkdirAll(output_dir,0755)

@@ -21,7 +21,7 @@ func NewFFMPEG(locn string, dir string) *ffmpeg {
 	}
 }
 
-func (f *ffmpeg) GenerateThumbnail(ctx context.Context, job *queue.JobQueue) error {
+func (f *ffmpeg) GenerateThumbnail(ctx context.Context, job queue.JobQueue) error {
 	fmt.Println("Entering into generating thubnail from FFMPEG output raw hls segments")
     src:=filepath.Join(job.OutPutDir,"index.m3u8")
 	dst:=filepath.Join(job.OutPutDir,"ani.jpg")

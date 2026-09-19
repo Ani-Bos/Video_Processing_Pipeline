@@ -6,5 +6,5 @@ import (
 )
 
 type ThubnailManager interface {
-	GenerateThumbnail(ctx context.Context, job *queue.JobQueue)error
+	GenerateThumbnail(ctx context.Context, job queue.JobQueue)error
 }

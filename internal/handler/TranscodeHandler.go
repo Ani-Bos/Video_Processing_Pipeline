@@ -14,10 +14,10 @@ type TranscodeHandler struct {
 	nextTask queue.AsyncPublishManager
 }
 
-func NewTranscodeHandler(trnscdr *transcoder.TranscoderManager, tsk *queue.AsyncPublishManager) *TranscodeHandler {
+func NewTranscodeHandler(trnscdr transcoder.TranscoderManager, tsk queue.AsyncPublishManager) *TranscodeHandler {
 	return &TranscodeHandler{
-		tc: *trnscdr,
-		nextTask: *tsk,
+		tc: trnscdr,
+		nextTask: tsk,
 	}
 }
 

@@ -1,28 +1,50 @@
 services:
-  go-video-pipeline:
-    build: .
+  upload:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: upload
     ports:
       - "8080:8080"
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
-      REDIS_URL: 
-      REDIS_PWD: 
+      REDIS_ADDR: redis:6379
+      REDIS_PWD: redis
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - media:/data
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-    networks:
-      - app-network
+
+  worker:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: worker
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
+      REDIS_ADDR: redis:6379
+      REDIS_PWD: redis
+      FFMPEG_BIN: ffmpeg
+      FFMPEG_WORKDIR: /data/transcode
+      UPLOAD_DIR: /data/uploads
+    volumes:
+      - media:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: 
-      POSTGRES_PASSWORD: 
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: video_db
-    ports:
-      - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
@@ -30,14 +52,10 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
 
   redis:
     image: redis:7.2-alpine
     command: redis-server --requirepass redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -45,13 +63,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-    networks:
-      - app-network
 
 volumes:
   postgres-data:
   redis-data:
-
-networks:
-  app-network:
-    driver: bridge
+  media:
