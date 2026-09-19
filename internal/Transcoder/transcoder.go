@@ -28,6 +28,7 @@ func (f *ffmpeg) Transcode(ctx context.Context, job *queue.JobQueue) error {
 	if err!=nil{
 		return err
 	}
+	job.OutPutDir=output_dir
 	output_file_locn:=filepath.Join(output_dir,"index.m3u8")
 	//use ffmpeg docs
 	//This command encodes a video with good quality, using slower preset to achieve better compression:

@@ -28,7 +28,7 @@ func(c *ChunkRepo) FindChunkByUploadID(ctx context.Context, uploadId string)(*mo
 		return nil,errors.New("UploadId string cant be empty or null")
 	}
 	var chunk_ssn model.Chunk_Session
-	err:=c.DB.WithContext(ctx).Where(&model.Chunk_Session{UploadID:uploadId}).First(&chunk_ssn).Error
+	err:=c.DB.WithContext(ctx).Model(&model.Chunk_Session{}).Where("upload_id=?",uploadId).First(&chunk_ssn).Error
 	if err!=nil{
 		return nil,err
 	}
@@ -40,7 +40,7 @@ func(c *ChunkRepo)FindUploadedChunks(ctx context.Context, uploadID string)([]int
 		return nil,errors.New("UploadId string cant be empty or null")
 	}
 	var chunk_list []int
-	err:=c.DB.WithContext(ctx).Where(&model.Chunk{UploadID: uploadID}).Pluck("index",&chunk_list).Error
+	err:=c.DB.WithContext(ctx).Model(&model.Chunk{}).Where("upload_id=?",uploadID).Pluck("chunk_index",&chunk_list).Error
 	if err!=nil{
 		return nil,err
 	}
@@ -67,7 +67,7 @@ func(c* ChunkRepo)MarkChunkUploaded(ctx context.Context,uploadID string, chunkIn
 
 func(c *ChunkRepo)GetUploadedCount(ctx context.Context,uploadId string)(int64,error){
 	var cnt int64
-	err:=c.DB.Where(&model.Chunk{UploadID: uploadId}).Count(&cnt).Error
+	err:=c.DB.Model(&model.Chunk{}).Where("upload_id=?",uploadId).Count(&cnt).Error
 	if err!=nil{
         return 0,err
 	}

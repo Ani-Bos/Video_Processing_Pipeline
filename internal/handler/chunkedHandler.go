@@ -13,13 +13,13 @@ import (
 )
 
 type HandlerStruct struct{
-	manager chunkersse.UploadManager
+	manager chunkersse.UploadDBManager
 	srvc service.InterfaceInjectRepoJob
 	chunkrepo repository.ChunkRepo
 	asyncsrvc queue.AsyncPublishersrvc
 }
 
-func NewHandlerStruct(mgr chunkersse.UploadManager, srvc service.InterfaceInjectRepoJob,
+func NewHandlerStruct(mgr chunkersse.UploadDBManager, srvc service.InterfaceInjectRepoJob,
 	chnkrpo repository.ChunkRepo, asyqueu queue.AsyncPublishersrvc)*HandlerStruct{
 	return &HandlerStruct{
       manager: mgr,
@@ -51,6 +51,7 @@ func(h *HandlerStruct)HandleStartUpload(w http.ResponseWriter, r *http.Request){
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("upload session is", uploadsession)
 	//returning uploaded session details
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(uploadsession)
@@ -59,9 +60,11 @@ func(h *HandlerStruct)HandleStartUpload(w http.ResponseWriter, r *http.Request){
 func(h *HandlerStruct)HandleUploadChunks(w http.ResponseWriter, r *http.Request){
 	fmt.Println("Entering into uploading chunks")
 	uploadID := r.URL.Query().Get("upload_id")
+	fmt.Println("upload Id in fxn handle upload chunks is ", uploadID)
 	chunknum:=0
 	chunkstr := r.URL.Query().Get("chunk")
 	chunknum, err := strconv.Atoi(chunkstr)
+	fmt.Println("chunk number is ",chunknum)
 	if err!=nil{
 		http.Error(w, "Invalid chunk number", http.StatusBadRequest)
         return
@@ -71,6 +74,7 @@ func(h *HandlerStruct)HandleUploadChunks(w http.ResponseWriter, r *http.Request)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("upload ack is", upload_ack)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(upload_ack)
 }

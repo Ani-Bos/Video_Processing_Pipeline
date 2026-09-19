@@ -18,5 +18,5 @@ type Chunk_Session struct {
 type Chunk struct{
 	gorm.Model
 	UploadID string `gorm:"uniqueIndex:idx_upload_chunk;not null"`
-	Index int `gorm:"uniqueIndex:idx_upload_chunk;not null"`
+	Index int `gorm:"column:chunk_index;uniqueIndex:idx_upload_chunk;not null"`
 }
