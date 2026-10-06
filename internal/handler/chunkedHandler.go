@@ -1,5 +1,4 @@
 package handler
-
 import (
 	"encoding/json"
 	"fmt"
