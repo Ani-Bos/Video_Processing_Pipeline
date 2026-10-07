@@ -24,6 +24,8 @@ services:
       context: .
       dockerfile: dockerfile
       target: worker
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
       REDIS_ADDR: redis:6379
@@ -31,6 +33,12 @@ services:
       FFMPEG_BIN: ffmpeg
       FFMPEG_WORKDIR: /data/transcode
       UPLOAD_DIR: /data/uploads
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: "587"
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_TO: ${SMTP_TO}
     volumes:
       - media:/data
     depends_on:

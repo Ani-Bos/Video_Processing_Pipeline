@@ -29,15 +29,20 @@ var  Notifier = (*NotifyManager)(nil)
 func(N *NotifyManager)Notify(ctx context.Context, job *model.Jobs_Database) error {
   fmt.Println("Enter into notification service to notify users")
   authclient:=smtp.PlainAuth("",N.cfg.Username,N.cfg.Password,N.cfg.Host)
-  msg:= strings.Join([]string{
-    "From: your-email@example.com",
-    "To: recipient@example.com",
-    "Subject: Hello there",
-    "",
-    "This is the email body.",
+  msg := strings.Join([]string{
+	"From: " + N.cfg.From,
+	"To: " + strings.Join(N.cfg.To, ", "),
+	"Subject: Video " + job.Status + ": " + job.FileName,
+	"",
+	"Job " + job.VideoId + " status=" + job.Status,
 }, "\r\n")
   //func smtp.SendMail(addr string, a smtp.Auth, from string, to []string, msg []byte) error
-  err:=smtp.SendMail(N.cfg.Host,authclient,N.cfg.From,N.cfg.To,[]byte(msg))
+  port:=N.cfg.Port
+  if port==0{
+    port=587
+  }
+  addr := fmt.Sprintf("%s:%d", N.cfg.Host, port)
+  err:=smtp.SendMail(addr,authclient,N.cfg.From,N.cfg.To,[]byte(msg))
   if(err!=nil){
 	return err
   }
