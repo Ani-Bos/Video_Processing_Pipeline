@@ -154,6 +154,17 @@ worker-1    | frame=    1 fps=0.0 q=3.0 Lsize=N/A time=00:00:00.00 bitrate=N/A s
 worker-1    | Entering into publish events
 worker-1    | task queue created &{notify [123 34 86 105 100 101 111 73 100 34 58 34 51 53 53 102 56 56 49 48 56 49 102 98 53 57 49 52 97 50 49 56 102 56 57 56 102 54 49 55 55 97 57 99 34 44 34 82 97 119 80 97 116 104 34 58 34 47 100 97 116 97 47 117 112 108 111 97 100 115 47 99 58 92 92 85 115 101 114 115 92 92 65 110 105 107 101 116 92 92 68 111 99 117 109 101 110 116 115 92 92 49 48 56 48 95 51 48 95 56 46 48 48 95 74 117 110 50 50 50 48 50 49 40 49 41 46 109 112 52 34 44 34 70 105 108 101 78 97 109 101 34 58 34 99 58 92 92 85 115 101 114 115 92 92 65 110 105 107 101 116 92 92 68 111 99 117 109 101 110 116 115 92 92 49 48 56 48 95 51 48 95 56 46 48 48 95 74 117 110 50 50 50 48 50 49 40 49 41 46 109 112 52 34 44 34 79 117 116 80 117 116 68 105 114 34 58 34 47 100 97 116 97 47 116 114 97 110 115 99 111 100 101 47 51 53 53 102 56 56 49 48 56 49 102 98 53 57 49 52 97 50 49 56 102 56 57 56 102 54 49 55 55 97 57 99 34 125] map[] [3 critical] <nil>}
 worker-1    | asynq: pid=1 2026/09/19 20:35:49.268275 WARN: Retry exhausted for task id=609fa42c-d674-4cba-bb3e-ebce980a0805
+worker-1    | Enter into simple notification handler
+worker-1    | Enter into notification service to notify users
+worker-1    | authn string is &{ }
+worker-1    | msg is From:
+worker-1    | To: 
+worker-1    | Subject: Video Uploaded: 
+worker-1    | 
+worker-1    | Job f9e2b589a865f2d238a27bc74833e237 status=Uploaded
+worker-1    | addres along with post is 
+worker-1    | email sent successfully
+
 
 ```
 
