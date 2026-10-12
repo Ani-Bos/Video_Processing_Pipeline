@@ -77,3 +77,10 @@ type UploadDBManager interface{
 	CompleteUpload(UploadId string)(*UploadResponse,error)
 	GetUploadStatus(UploadId string)(*UploadStatus,error)
 }
+
+type UploadMiniIODBManager interface{
+	InitiateUpload(req *RequestWrapper)(*ChunkedUpload,error)
+	UploadChunk(uploadId string, chunkNumber int, data io.Reader)(*ChunkAcknowledgemnt,error)
+	CompleteUpload(UploadId string)(*UploadResponse,error)
+	GetUploadStatus(UploadId string)(*UploadStatus,error)
+}

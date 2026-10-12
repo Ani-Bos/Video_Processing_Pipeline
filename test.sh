@@ -4,7 +4,7 @@ VIDEO="c:\\Users\\Aniket\\Documents\\1080_30_8.00_Jun222021(1).mp4"
 CHUNK_SIZE=5242880
 
 split -d -b "$CHUNK_SIZE" "$VIDEO" /tmp/chunk_
-
+# chunk sIZE  5mb total size of video 27 mb chunks 6 chunks
 resp=$(curl -s -X POST http://localhost:8080/upload/init \
   -H "Content-Type: application/json" \
   -d '{"filename":"c:\\Users\\Aniket\\Documents\\1080_30_8.00_Jun222021(1).mp4","total_size":28857413,"chunk_size":5242880}')
