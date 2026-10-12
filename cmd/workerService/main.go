@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+
 	db := initializer.DbInitializer{}
 	initializer.ConnectDB(&db)
 	jobs_repo:=repository.JobRepo{DB:db.DB}

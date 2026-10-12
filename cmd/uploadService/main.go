@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 	initializer "video_processing_pipeline/internal/Initializer"
 	"video_processing_pipeline/internal/handler"
 	"video_processing_pipeline/internal/model"
@@ -12,10 +14,13 @@ import (
 	"video_processing_pipeline/internal/repository"
 	"video_processing_pipeline/internal/service"
 	"video_processing_pipeline/internal/uploader/chunkersse"
+
 	"github.com/hibiken/asynq"
 )
 
 func main() {
+	ctx,cancel:=context.WithTimeout(context.Background(),5*time.Second)
+	defer cancel()
 	db := initializer.DbInitializer{}
 	initializer.ConnectDB(&db)
 	db.DB.AutoMigrate(&model.Chunk{}, &model.Chunk_Session{},&model.Jobs_Database{})
@@ -30,12 +35,19 @@ func main() {
     }
 	client:=asynq.NewClient(redisoption)
 	defer client.Close()
-	dir := os.Getenv("UPLOAD_DIR")
-	if dir == "" {
-		dir = "/data/uploads"
+	// dir := os.Getenv("UPLOAD_DIR")
+	// if dir == "" {
+	// 	dir = "/data/uploads"
+	// }
+	bucketname:="videoProcessing"
+    minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
+	if err!=nil{
+		fmt.Errorf("Statup failed due to miniiIo",err)
+		return
 	}
     publisher:=queue.NewAsyncPublisher(client)
-	manager:=chunkersse.NewDBManager(repo, dir)
+	// manager:=chunkersse.NewDBManager(repo, dir)
+	manager:=chunkersse.NewMiniIOManager(*repo,minioclient,bucketname)
 	handler1:=handler.NewHandlerStruct(manager,*jobs_db,*repo,*publisher)
 	// manager:=chunkersse.NewChunkedUploadManager("uploads")
 	// handler1:=handler.NewHandlerStruct(manager)

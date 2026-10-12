@@ -12,11 +12,11 @@ import (
 
 type MiniIOManager struct {
 	repo repository.ChunkRepo
-	client minio.Client
+	client *minio.Client
 	bucketName string
 }
 
-func NewMiniIOManager(Repo repository.ChunkRepo, clnt minio.Client,bucket string)*MiniIOManager{
+func NewMiniIOManager(Repo repository.ChunkRepo, clnt *minio.Client,bucket string)*MiniIOManager{
 	return &MiniIOManager{
       repo: Repo,
 	  client: clnt,
