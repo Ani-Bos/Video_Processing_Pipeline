@@ -42,7 +42,7 @@ func main() {
 	bucketname:="videoProcessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
 	if err!=nil{
-		fmt.Errorf("Statup failed due to miniiIo",err)
+		log.Fatal("Statup failed due to miniiIo",err)
 		return
 	}
     publisher:=queue.NewAsyncPublisher(client)

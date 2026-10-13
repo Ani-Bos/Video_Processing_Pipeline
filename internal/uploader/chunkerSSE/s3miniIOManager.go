@@ -3,10 +3,13 @@ package chunkersse
 import (
 	"context"
 	"fmt"
+	"io"
+	"path/filepath"
+	"strings"
 	"time"
 	"video_processing_pipeline/internal/model"
 	"video_processing_pipeline/internal/repository"
-    "io"
+
 	"github.com/minio/minio-go/v7"
 )
 
@@ -27,7 +30,7 @@ func NewMiniIOManager(Repo repository.ChunkRepo, clnt *minio.Client,bucket strin
 func(m *MiniIOManager)InitiateUpload(req *RequestWrapper)(*ChunkedUpload,error){
 	fmt.Println("Entering into initiate upload for MiniIO s3 equivalent")
 	ctx:=context.Background()
-   total_no_of_chunks := int(req.TotalSize / req.ChunkSize)
+     total_no_of_chunks := int(req.TotalSize / req.ChunkSize)
 	//like say 105 MB 10 MB so total is 10 chunks
 	//5 left so that why at last increased 1 to process that data as well
 	if (int)(req.TotalSize%req.ChunkSize) != 0 {
@@ -38,10 +41,11 @@ func(m *MiniIOManager)InitiateUpload(req *RequestWrapper)(*ChunkedUpload,error){
 	// if err := os.MkdirAll(uploadPath, 0755); err != nil {
 	// 	return nil, err
 	// }
-
+    filename:=strings.ReplaceAll(req.FileName,`\`, `/`)
+	basefilename:=filepath.Base(filename)
 	uploadsession := &model.Chunk_Session{
 		UploadID:    uploadID,
-		FileName:    req.FileName,
+		FileName:    basefilename,
 		TotalSize:   req.TotalSize,
 		ChunkSize:   req.ChunkSize,
 		TotalChunks: int64(total_no_of_chunks),
@@ -166,7 +170,7 @@ func(m *MiniIOManager)CompleteUpload(UploadId string)(*UploadResponse,error){
 			Object: chunkobj,
 		})
 	}
-	finalObj:=chunk_ssn.FileName
+	finalObj:=fmt.Sprintf("videos/%s/%s",UploadId,chunk_ssn.FileName)
 	_,err=m.client.ComposeObject(ctx,minio.CopyDestOptions{
 		Bucket: m.bucketName,
 		Object: finalObj,
@@ -191,7 +195,7 @@ func(m *MiniIOManager)CompleteUpload(UploadId string)(*UploadResponse,error){
 		UploadId:UploadId,
 		FileName:chunk_ssn.FileName,
 		Size:chunk_ssn.TotalSize,
-		FilePath:fmt.Sprintf("%s/%s",m.bucketName,finalObj),
+		FilePath:finalObj,
 	},nil
 	}
 	

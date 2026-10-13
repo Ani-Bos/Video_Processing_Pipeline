@@ -10,15 +10,49 @@ services:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
       REDIS_ADDR: redis:6379
       REDIS_PWD: redis
-      UPLOAD_DIR: /data/uploads
-    volumes:
-      - media:/data
+      S3_ENDPOINT: minio:9000
+      S3_ACCESS_KEY: ${MINIO_USER}
+      S3_SECRET_KEY: ${MINIO_PASSWORD}
+      S3_BUCKET: videos
+      S3_USE_SSL: "false"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
-  
+      minio:
+        condition: service_started
+
+  worker:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: worker
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
+      REDIS_ADDR: redis:6379
+      REDIS_PWD: redis
+      FFMPEG_BIN: ffmpeg
+      FFMPEG_WORKDIR: /tmp/work
+      S3_ENDPOINT: minio:9000
+      S3_ACCESS_KEY: ${MINIO_USER}
+      S3_SECRET_KEY: ${MINIO_PASSWORD}
+      S3_BUCKET: videos
+      S3_USE_SSL: "false"
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: "587"
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
+      SMTP_TO: ${SMTP_TO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+
   minio:
     image: cgr.dev/chainguard/minio:latest
     command: server /data --console-address ":9001"
@@ -30,54 +64,19 @@ services:
       - "9001:9001"
     volumes:
       - minio-data:/data
-    networks:
-      - app-network
 
   minio-init:
     image: cgr.dev/chainguard/minio-client:latest
     depends_on:
       - minio
+    restart: "no"
     entrypoint: ["/bin/sh", "-c"]
     command: >
-      mc alias set local http://minio:9000 minio minio12345 &&
-      mc mb -p local/videos &&
-      mc mb -p local/hls
-    networks:
-      - app-network
-
-  worker:
-    build:
-      context: .
-      dockerfile: dockerfile
-      target: worker
-    env_file:
-      - .env
+      mc alias set local http://minio:9000 ${MINIO_USER} ${MINIO_PASSWORD} &&
+      mc mb -p local/videos || true
     environment:
-      DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
-      REDIS_ADDR: redis:6379
-      REDIS_PWD: redis
-      FFMPEG_BIN: ffmpeg
-      FFMPEG_WORKDIR: /data/transcode
-      UPLOAD_DIR: /data/uploads
-      SMTP_HOST: ${SMTP_HOST}
-      SMTP_PORT: "587"
-      SMTP_USER: ${SMTP_USER}
-      SMTP_PASS: ${SMTP_PASS}
-      SMTP_FROM: ${SMTP_FROM}
-      SMTP_TO: ${SMTP_TO}
-      S3_ENDPOINT: ${MINIO_HOST} 
-      S3_ACCESS_KEY: ${MINIO_USER}
-      S3_SECRET_KEY: ${MINIO_PASSWORD}
-      S3_BUCKET_VIDEOS: videos
-      S3_BUCKET_HLS: hls
-      S3_USE_SSL: "false"
-    volumes:
-      - media:/data
-    depends_on:
-      redis:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
+      MINIO_USER: ${MINIO_USER}
+      MINIO_PASSWORD: ${MINIO_PASSWORD}
 
   postgres:
     image: postgres:16-alpine
@@ -107,6 +106,4 @@ services:
 volumes:
   postgres-data:
   redis-data:
-  media:
-
-  
+  minio-data:

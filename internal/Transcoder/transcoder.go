@@ -9,21 +9,21 @@ import (
 	"video_processing_pipeline/internal/queue"
 )
 
-type ffmpeg struct {
-	binlocn     string
-	working_dir string
+type FFMPEG struct {
+	BINLOCN     string
+	WORKING_DIR string
 }
 
-func NewFFMPEG(locn string, dir string) *ffmpeg {
-	return &ffmpeg{
-		binlocn:     locn,
-		working_dir: dir,
+func NewFFMPEG(locn string, dir string) *FFMPEG {
+	return &FFMPEG{
+		BINLOCN:     locn,
+		WORKING_DIR: dir,
 	}
 }
 
-func (f *ffmpeg) Transcode(ctx context.Context, job *queue.JobQueue) error {
+func (f * FFMPEG) Transcode(ctx context.Context, job *queue.JobQueue) error {
 	fmt.Println("Entering into transcoding using ffmpeg and hls format")
-	output_dir:= filepath.Join(f.working_dir,job.VideoId)
+	output_dir:= filepath.Join(f.WORKING_DIR,job.VideoId)
 	err:=os.MkdirAll(output_dir,0755)
 	if err!=nil{
 		return err
@@ -40,7 +40,7 @@ func (f *ffmpeg) Transcode(ctx context.Context, job *queue.JobQueue) error {
 	//crf constant rate factpr(0-51)
 	//audio codec //hls time basically segements cut into tjjhis length 6
 	//vod video on demand static not live stream
-	cmd:=exec.CommandContext(ctx,f.binlocn,
+	cmd:=exec.CommandContext(ctx,f.BINLOCN,
 		"-y", "-i", job.RawPath,
 		"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",
 		"-c:a", "aac",

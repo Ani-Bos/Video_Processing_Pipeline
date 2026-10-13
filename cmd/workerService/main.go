@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"time"
 	initializer "video_processing_pipeline/internal/Initializer"
 	thumbnail "video_processing_pipeline/internal/Thumbnail"
 	transcoder "video_processing_pipeline/internal/Transcoder"
@@ -15,7 +17,8 @@ import (
 )
 
 func main() {
-
+	ctx,cancel:=context.WithTimeout(context.Background(),5*time.Second)
+     defer cancel()
 	db := initializer.DbInitializer{}
 	initializer.ConnectDB(&db)
 	jobs_repo:=repository.JobRepo{DB:db.DB}
@@ -45,9 +48,15 @@ func main() {
 		os.Getenv("FFMPEG_BIN"),
 		os.Getenv("FFMPEG_WORKDIR"),
 	)
+	bucketname:="videoProcessing"
+    minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
+	if err!=nil{
+		log.Fatal("Statup failed due to miniiIo",err)
+		return
+	}
 
 	mux:=asynq.NewServeMux()
-	handler1:=handler.NewTranscodeHandler(newffmpeg,publisher)
+	handler1:=handler.NewTranscodeHandler(newffmpeg,newffmpeg,publisher,)
 	// handler2:=handler1.NewTranscodeHandler()
 	mux.HandleFunc(queue.TypeTranscode,handler1.HandleTranscoding)
 	handler2:=handler.NewTHubnailHandler(publisher,newffmpeg1)
