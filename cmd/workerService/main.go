@@ -9,6 +9,7 @@ import (
 	thumbnail "video_processing_pipeline/internal/Thumbnail"
 	transcoder "video_processing_pipeline/internal/Transcoder"
 	"video_processing_pipeline/internal/handler"
+	mediastore "video_processing_pipeline/internal/mediaStore"
 	"video_processing_pipeline/internal/notify"
 	"video_processing_pipeline/internal/queue"
 	"video_processing_pipeline/internal/repository"
@@ -48,6 +49,10 @@ func main() {
 		os.Getenv("FFMPEG_BIN"),
 		os.Getenv("FFMPEG_WORKDIR"),
 	)
+	newffmpeg2:=transcoder.NewFFMPEG(
+		os.Getenv("FFMPEG_BIN"),
+		os.Getenv("FFMPEG_WORKDIR"),
+	)
 	bucketname:="videoProcessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
 	if err!=nil{
@@ -56,7 +61,8 @@ func main() {
 	}
 
 	mux:=asynq.NewServeMux()
-	handler1:=handler.NewTranscodeHandler(newffmpeg,newffmpeg,publisher,)
+	MediaStrMgr:=mediastore.NewMediaStore(nil,minioclient,bucketname)
+	handler1:=handler.NewTranscodeHandler(*newffmpeg2,newffmpeg,publisher,MediaStrMgr)
 	// handler2:=handler1.NewTranscodeHandler()
 	mux.HandleFunc(queue.TypeTranscode,handler1.HandleTranscoding)
 	handler2:=handler.NewTHubnailHandler(publisher,newffmpeg1)
@@ -69,7 +75,7 @@ func main() {
 	From:     os.Getenv("SMTP_FROM"),    
 	To:       []string{os.Getenv("SMTP_TO")},
 }
-    mailDetails := notify.NewNotifyManager(smtpCfg)
+    mailDetails := notify.NewNotifyManager(smtpCfg,*MediaStrMgr)
 	handler3:=handler.NewNotificationHandler(*mailDetails,jobs_repo)
 	mux.HandleFunc(queue.TypeNotify,handler3.NotificationHandler)
 	log.Println("starting worker service to do processing of thumnaila nd transcode")

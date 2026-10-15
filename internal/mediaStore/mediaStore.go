@@ -16,6 +16,14 @@ type MediaStore struct {
 	Bucket string
 }
 
+func NewMediaStore(Md MediaStoreManager, clnt *minio.Client, Bckt string)*MediaStore{
+	return &MediaStore{
+      Media: Md,
+	  Client: clnt,
+	  Bucket: Bckt,
+	}
+}
+
 func (M *MediaStore)PresignedGet(ctx context.Context, key string )(string,error){
   fmt.Println("Entering into getting presigned url")
   url,err:=M.Client.PresignedGetObject(ctx,M.Bucket,key,24*time.Hour,nil)

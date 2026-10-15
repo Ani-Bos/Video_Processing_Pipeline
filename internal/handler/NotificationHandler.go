@@ -8,7 +8,6 @@ import (
 	"video_processing_pipeline/internal/notify"
 	"video_processing_pipeline/internal/queue"
 	"video_processing_pipeline/internal/repository"
-
 	"github.com/hibiken/asynq"
 )
 

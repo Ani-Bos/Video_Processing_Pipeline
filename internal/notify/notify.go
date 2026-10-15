@@ -18,12 +18,12 @@ type ConfigSMTP struct{
 }
 type NotifyManager struct {
 	cfg ConfigSMTP
-  store mediastore.MediaStoreManager
+  store mediastore.MediaStore
 }
 
 func NewNotifyManager( cnfg ConfigSMTP, stre mediastore.MediaStore) *NotifyManager {
 	return &NotifyManager{ cfg: cnfg,
-   store: &stre,
+   store: stre,
   }
 }
 

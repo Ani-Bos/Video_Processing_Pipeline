@@ -16,10 +16,10 @@ type TranscodeHandler struct {
 	 trnscdr       transcoder.FFMPEG
 	 tc transcoder.TranscoderManager
 	nextTask queue.AsyncPublishManager
-	stre  mediastore.MediaStoreManager
+	stre  *mediastore.MediaStore
 }
 
-func NewTranscodeHandler(tcdr transcoder.FFMPEG,trnscdr transcoder.TranscoderManager, tsk queue.AsyncPublishManager, Mediastr mediastore.MediaStoreManager) *TranscodeHandler {
+func NewTranscodeHandler(tcdr transcoder.FFMPEG,trnscdr transcoder.TranscoderManager, tsk queue.AsyncPublishManager, Mediastr *mediastore.MediaStore) *TranscodeHandler {
 	return &TranscodeHandler{
 		trnscdr: tcdr,
 		tc: trnscdr,
