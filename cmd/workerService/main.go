@@ -53,7 +53,7 @@ func main() {
 		os.Getenv("FFMPEG_BIN"),
 		os.Getenv("FFMPEG_WORKDIR"),
 	)
-	bucketname:="videoProcessing"
+	bucketname:="videoprocessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
 	if err!=nil{
 		log.Fatal("Statup failed due to miniiIo",err)

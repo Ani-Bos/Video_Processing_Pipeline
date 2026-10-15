@@ -39,7 +39,7 @@ func main() {
 	// if dir == "" {
 	// 	dir = "/data/uploads"
 	// }
-	bucketname:="videoProcessing"
+	bucketname:="videoprocessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
 	if err!=nil{
 		log.Fatal("Statup failed due to miniiIo",err)

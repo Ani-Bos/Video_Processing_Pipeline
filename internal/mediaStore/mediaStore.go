@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
 	"github.com/minio/minio-go/v7"
 )
 
