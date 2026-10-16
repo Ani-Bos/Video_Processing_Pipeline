@@ -37,10 +37,12 @@ func(n *NotificationHandler)NotificationHandler(ctx context.Context, task *asynq
 	if jobs.NotifiedAt!=nil{
 		return nil
 	}
+	fmt.Println("jobs in db look like this", jobs)
     err=n.Ntfy.Notify(ctx,jobs)
 	if err!=nil{
 		return err
 	}
+	fmt.Println("Notification done ")
 	now:=time.Now().UTC()
 	jobs.NotifiedAt=&now
     return n.Repo.Update(ctx,jobs)

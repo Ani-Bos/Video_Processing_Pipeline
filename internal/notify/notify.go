@@ -3,6 +3,7 @@ package notify
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/smtp"
 	"strings"
 	mediastore "video_processing_pipeline/internal/mediaStore"
@@ -36,6 +37,7 @@ func(N *NotifyManager)Notify(ctx context.Context, job *model.Jobs_Database) erro
   fmt.Println("authn string is", authclient)
   urlstring,err:=N.store.PresignedGet(ctx,job.RawPath)
   if err!=nil{
+    log.Printf("presign key=%q bucket=%s: %v",job.RawPath,N.store.Bucket,err)
     return err
   }
   msg := strings.Join([]string{

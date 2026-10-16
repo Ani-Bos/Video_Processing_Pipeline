@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -15,11 +16,12 @@ import (
 	"video_processing_pipeline/internal/repository"
 
 	"github.com/hibiken/asynq"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func main() {
 	ctx,cancel:=context.WithTimeout(context.Background(),5*time.Second)
-     defer cancel()
 	db := initializer.DbInitializer{}
 	initializer.ConnectDB(&db)
 	jobs_repo:=repository.JobRepo{DB:db.DB}
@@ -55,6 +57,7 @@ func main() {
 	)
 	bucketname:="videoprocessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
+	defer cancel()
 	if err!=nil{
 		log.Fatal("Statup failed due to miniiIo",err)
 		return
@@ -75,7 +78,21 @@ func main() {
 	From:     os.Getenv("SMTP_FROM"),    
 	To:       []string{os.Getenv("SMTP_TO")},
 }
-    mailDetails := notify.NewNotifyManager(smtpCfg,*MediaStrMgr)
+    access_key:=os.Getenv("S3_ACCESS_KEY")
+	secret_key:=os.Getenv("S3_SECRET_KEY")
+	notifyhst:=os.Getenv("S3_PUBLIC_ENDPOINT")
+	fmt.Println("notifyhost is",notifyhst)
+    notifyclient,err1:=minio.New(notifyhst,&minio.Options{
+		Creds: credentials.NewStaticV4(access_key,secret_key,""),
+		Secure: false,
+		Region: "us-east-1",
+	})
+	if err1!=nil{
+		log.Fatal("Statup failed due to miniiIo notification client",err1)
+		return
+	}
+	Notifystrmgr:=mediastore.NewMediaStore(nil,notifyclient,bucketname)
+    mailDetails := notify.NewNotifyManager(smtpCfg,*Notifystrmgr)
 	handler3:=handler.NewNotificationHandler(*mailDetails,jobs_repo)
 	mux.HandleFunc(queue.TypeNotify,handler3.NotificationHandler)
 	log.Println("starting worker service to do processing of thumnaila nd transcode")
