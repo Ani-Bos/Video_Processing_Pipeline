@@ -40,6 +40,7 @@ func (f * FFMPEG) Transcode(ctx context.Context, job *queue.JobQueue) error {
 	//crf constant rate factpr(0-51)
 	//audio codec //hls time basically segements cut into tjjhis length 6
 	//vod video on demand static not live stream
+	//videos/1b0d89f1e180f598ba0118987bb49e39/1080_30_8.00_Jun222021(1).mp4
 	cmd:=exec.CommandContext(ctx,f.BINLOCN,
 		"-y", "-i", job.RawPath,
 		"-c:v", "libx264", "-preset", "veryfast", "-crf", "23",

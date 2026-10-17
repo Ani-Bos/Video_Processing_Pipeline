@@ -36,12 +36,21 @@ func(th *TranscodeHandler)HandleTranscoding(ctx context.Context, t *asynq.Task)e
 		return err1
 	}
 	localfile:= filepath.Join(th.trnscdr.WORKING_DIR,jbq.VideoId,"source.mp4")
+	fmt.Println("job raw path is as: ", jbq.RawPath)
+	fmt.Println("local path of jobs db for transcoding and downloading object",localfile)
+	//here basiucally downloading the minio object hat is uploaded as a complete in handlecompleteupload
+	//store.DownloadOnject(ctx, jbq.OutPutDir, localDir);
 	err:=th.stre.DownloadObject(ctx,jbq.RawPath,localfile)
 	if err!=nil{
 		return err
 	}
 	jbq.RawPath=localfile
     err=th.tc.Transcode(ctx,&jbq)
+	if err!=nil{
+		return err
+	}
+	//pushing object into bucket to prevent concurrency issue
+	_,err=th.stre.PutObjects(ctx,jbq.OutPutDir)
 	if err!=nil{
 		return err
 	}

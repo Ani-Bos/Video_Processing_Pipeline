@@ -38,9 +38,18 @@ func(M *MediaStore)DownloadObject(ctx context.Context,key string,dest string)err
 	if err!=nil{
 		return err
 	}
+	//jbq.RawPath-->key,localfile-->destination
 	err=M.Client.FGetObject(ctx,M.Bucket,key,dest,minio.GetObjectOptions{})
 	if err!=nil{
 		return err
 	}
 	return nil
+}
+
+func(M *MediaStore)PutObjects(ctx context.Context,key string)(*minio.UploadInfo,error){
+	fmt.Println("entering into put objects wrapper for moving the hls format to put into bucket after transcoding and consume in thumbnai generation to prevent concurrency issue")
+	// M.Client.PutObject(ctx,M.Bucket,key,minio.PutObjectOptions{
+	// 	ContentType:  "application/octet-stream",
+	// })
+	return nil,nil
 }

@@ -23,6 +23,7 @@ func NewFFMPEG(locn string, dir string) *ffmpeg {
 
 func (f *ffmpeg) GenerateThumbnail(ctx context.Context, job queue.JobQueue) error {
 	fmt.Println("Entering into generating thubnail from FFMPEG output raw hls segments")
+	//this is output dest directory  transcode becomes src directory of thumbnail
     src:=filepath.Join(job.OutPutDir,"index.m3u8")
 	dst:=filepath.Join(job.OutPutDir,"ani.jpg")
 	//basically after 1 frame peocessing generate image in dst
