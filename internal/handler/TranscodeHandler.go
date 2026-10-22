@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
 	"path/filepath"
 	"video_processing_pipeline/internal/Transcoder"
 	mediastore "video_processing_pipeline/internal/mediaStore"
 	"video_processing_pipeline/internal/queue"
-
 	"github.com/hibiken/asynq"
 )
 
@@ -35,12 +35,14 @@ func(th *TranscodeHandler)HandleTranscoding(ctx context.Context, t *asynq.Task)e
 	if err1!=nil{
 		return err1
 	}
-	localfile:= filepath.Join(th.trnscdr.WORKING_DIR,jbq.VideoId,"source.mp4")
+	srckey:=jbq.RawPath
+	localdir:=filepath.Join(th.trnscdr.WORKING_DIR,jbq.VideoId)
+	localfile:= filepath.Join(localdir,"source.mp4")
 	fmt.Println("job raw path is as: ", jbq.RawPath)
 	fmt.Println("local path of jobs db for transcoding and downloading object",localfile)
 	//here basiucally downloading the minio object hat is uploaded as a complete in handlecompleteupload
 	//store.DownloadOnject(ctx, jbq.OutPutDir, localDir);
-	err:=th.stre.DownloadObject(ctx,jbq.RawPath,localfile)
+	err:=th.stre.DownloadObject(ctx,srckey,localfile)
 	if err!=nil{
 		return err
 	}
@@ -50,10 +52,15 @@ func(th *TranscodeHandler)HandleTranscoding(ctx context.Context, t *asynq.Task)e
 		return err
 	}
 	//pushing object into bucket to prevent concurrency issue
-	_,err=th.stre.PutObjects(ctx,jbq.OutPutDir)
+	//creating a common path rather than tmp
+	prefix:="hls"+jbq.VideoId
+	err=th.stre.PutDirObjects(ctx,jbq.OutPutDir,prefix)
 	if err!=nil{
 		return err
 	}
+	_=os.RemoveAll(localdir)
+	jbq.FileName=srckey
+	jbq.OutPutDir=prefix
 	err=th.nextTask.Publish(ctx,queue.TypeThumbnail,&jbq)
 	if err!=nil{
 		return err

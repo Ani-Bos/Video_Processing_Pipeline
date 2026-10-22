@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 	"github.com/minio/minio-go/v7"
 )
@@ -46,10 +47,70 @@ func(M *MediaStore)DownloadObject(ctx context.Context,key string,dest string)err
 	return nil
 }
 
-func(M *MediaStore)PutObjects(ctx context.Context,key string)(*minio.UploadInfo,error){
+func(M *MediaStore)PutDirObjects(ctx context.Context,key string,pref string)(error){
 	fmt.Println("entering into put objects wrapper for moving the hls format to put into bucket after transcoding and consume in thumbnai generation to prevent concurrency issue")
-	// M.Client.PutObject(ctx,M.Bucket,key,minio.PutObjectOptions{
-	// 	ContentType:  "application/octet-stream",
-	// })
-	return nil,nil
+	localfiles,err:=os.ReadDir(key)
+	if err!=nil{
+		return err
+	}
+	for _, i := range(localfiles){
+     if i.IsDir(){
+		continue
+	 }
+	 path:=filepath.Join(key,i.Name())
+	 file,err:=os.Open(path)
+	 if err!=nil{
+		return nil
+	 }
+	 fileinfo,err:=file.Stat()
+	 if err!=nil{
+		file.Close()
+		return err
+	 }
+	 prefixFilename:=pref+"/"+i.Name()
+     _,err=M.Client.PutObject(ctx,M.Bucket,prefixFilename,file,fileinfo.Size(),minio.PutObjectOptions{
+	})
+	file.Close()
+	if err!=nil{
+		return err
+	}
+	}
+	return nil
+}
+
+func(M *MediaStore)DownloadHLSObject(ctx context.Context,key string, pref string)(error){
+	fmt.Println("Entering into getting all hls output by transcoding in the prefix hls directory")
+	err:=os.MkdirAll(key,0755)
+	if err!=nil{
+		return err
+	}
+	for i:= range M.Client.ListObjects(ctx,M.Bucket,minio.ListObjectsOptions{Prefix: pref+"/",Recursive: true}){
+      if i.Err!=nil{
+		return i.Err
+	  }
+	  filename:=strings.TrimPrefix(i.Key,pref+"/")
+	  dest:=filepath.Join(key,filename)
+	  err=M.Client.FGetObject(ctx,M.Bucket,i.Key,dest,minio.GetObjectOptions{})
+	  if err!=nil{
+		return err
+	  }
+	}
+	return nil
+}
+func(M *MediaStore)PutFileObject(ctx context.Context,key string,dest string)(error){
+	fmt.Println("Entering into putting the output thubnail image in the minio bucket")
+	file,err:=os.Open(dest)
+	if err!=nil{
+		return err
+	}
+	defer file.Close()
+	fileinfo,err:=file.Stat()
+	if err!=nil{
+		return err
+	}
+	_,err=M.Client.PutObject(ctx,M.Bucket,key,file,fileinfo.Size(),minio.PutObjectOptions{})
+	if err!=nil{
+		return err
+	}
+	return nil
 }

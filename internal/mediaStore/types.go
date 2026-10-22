@@ -2,12 +2,12 @@ package mediastore
 
 import (
 	"context"
-
-	"github.com/minio/minio-go/v7"
 )
 
 type MediaStoreManager interface {
 	PresignedGet(ctx context.Context,key string )(string,error)
 	DownloadObject(ctx context.Context,key string,dest string)error
-	PutObjects(ctx context.Context,key string)(*minio.UploadInfo,error)
+	PutDirObjects(ctx context.Context,key string, pref string)(error)
+	DownloadHLSObject(ctx context.Context,key string, pref string)(error)
+	PutFileObject(ctx context.Context,key string,dest string)(error)
 }
