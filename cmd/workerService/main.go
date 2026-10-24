@@ -9,6 +9,7 @@ import (
 	initializer "video_processing_pipeline/internal/Initializer"
 	thumbnail "video_processing_pipeline/internal/Thumbnail"
 	transcoder "video_processing_pipeline/internal/Transcoder"
+	"video_processing_pipeline/internal/caption"
 	"video_processing_pipeline/internal/handler"
 	mediastore "video_processing_pipeline/internal/mediaStore"
 	"video_processing_pipeline/internal/notify"
@@ -59,6 +60,11 @@ func main() {
 		os.Getenv("FFMPEG_BIN"),
 		os.Getenv("FFMPEG_WORKDIR"),
 	)
+	newWhisperManager:=caption.NewWhisperManager(
+		os.Getenv("WHISPER_BIN"),
+		os.Getenv("FFMPEG_WORKDIR"),
+		os.Getenv("MODEL_LOCATION"),
+	)
 	bucketname:="videoprocessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
 	defer cancel()
@@ -69,7 +75,7 @@ func main() {
 
 	mux:=asynq.NewServeMux()
 	MediaStrMgr:=mediastore.NewMediaStore(nil,minioclient,bucketname)
-	handler1:=handler.NewTranscodeHandler(*newffmpeg2,newffmpeg,publisher,MediaStrMgr)
+	handler1:=handler.NewTranscodeHandler(*newffmpeg2,newffmpeg,publisher,MediaStrMgr,newWhisperManager)
 	// handler2:=handler1.NewTranscodeHandler()
 	mux.HandleFunc(queue.TypeTranscode,handler1.HandleTranscoding)
 	handler2:=handler.NewTHubnailHandler(publisher,newffmpeg1,MediaStrMgr,*newffmpeg3)

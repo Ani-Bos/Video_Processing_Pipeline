@@ -8,6 +8,15 @@ COPY . .
 RUN go build -o /out/upload ./cmd/uploadService
 RUN go build -o /out/worker ./cmd/workerService
 
+#https://github.com/ggml-org/whisper.cpp
+
+FROM alpine:3.20 AS whisperWorker
+WORKDIR /whisper
+RUN apk add --no-cache git make g++ bash curl
+RUN git clone --depth 1 --branch v1.7.4 https://github.com .
+RUN make main
+RUN bash ./models/download-ggml-model.sh small
+
 FROM alpine:3.20 AS upload
 WORKDIR /app
 COPY --from=builder /out/upload .
@@ -17,7 +26,10 @@ CMD ["./upload"]
 
 FROM alpine:3.20 AS worker
 WORKDIR /app
-RUN apk add --no-cache ffmpeg ca-certificates
+RUN apk add --no-cache ffmpeg ca-certificates libstdc++
+COPY --from=whisperWorker /whisper/main /usr/local/bin/whisper-cli
+RUN mkdir -p /app/models
+COPY --from=whisperWorker /whisper/models/ggml-small.bin /app/models/ggml-small.bin
 COPY --from=builder /out/worker .
 RUN chmod +x ./worker
 ENV FFMPEG_BIN=ffmpeg

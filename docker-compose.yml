@@ -33,6 +33,8 @@ services:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/video_db?sslmode=disable
       REDIS_ADDR: redis:6379
       REDIS_PWD: redis
+      WHISPER_BIN: whisper-cli
+      MODEL_LOCATION: /app/models/ggml-small.bin
       FFMPEG_BIN: ffmpeg
       FFMPEG_WORKDIR: /tmp/work
       S3_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_HOST}
