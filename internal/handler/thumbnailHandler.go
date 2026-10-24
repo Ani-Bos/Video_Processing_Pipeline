@@ -37,6 +37,8 @@ func(t *ThumbnailHandler)HandleThumbnail(ctx context.Context, task *asynq.Task)e
 	}
 	prefix:=jbq.OutPutDir
 	localdir:=filepath.Join(t.trnscdr.WORKING_DIR,jbq.VideoId)
+	fmt.Println("prefix under thumbnail is :",prefix)
+	fmt.Println("localdir under thumbnail is :",localdir)
 	err=t.stre.DownloadHLSObject(ctx,localdir,prefix)
 	if err!=nil{
 		return err
@@ -46,12 +48,14 @@ func(t *ThumbnailHandler)HandleThumbnail(ctx context.Context, task *asynq.Task)e
 	if err1!=nil{
 		return err1
 	}
-	imagepath:=filepath.Join(localdir,"image.jpg")
-	err=t.stre.PutFileObject(ctx,prefix+"/image.jpg",imagepath)
+	imagepath:=filepath.Join(localdir,"ani.jpg")
+	fmt.Println("image path final thubnai;l image in handler is ",imagepath)
+	err=t.stre.PutFileObject(ctx,prefix+"/ani.jpg",imagepath)
 	if err!=nil{
 		return err
 	}
 	_=os.RemoveAll(localdir)
+	fmt.Println("thumbnail image uploaded into bucket")
 	jbq.OutPutDir=prefix
 	err2:=t.next.Publish(ctx,queue.TypeNotify,&jbq)
 	if err2!=nil{

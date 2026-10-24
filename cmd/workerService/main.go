@@ -55,6 +55,10 @@ func main() {
 		os.Getenv("FFMPEG_BIN"),
 		os.Getenv("FFMPEG_WORKDIR"),
 	)
+	newffmpeg3:=transcoder.NewFFMPEG(
+		os.Getenv("FFMPEG_BIN"),
+		os.Getenv("FFMPEG_WORKDIR"),
+	)
 	bucketname:="videoprocessing"
     minioclient,err:=initializer.ConnectMiniIOAndCreateBucket(ctx,bucketname)
 	defer cancel()
@@ -68,7 +72,7 @@ func main() {
 	handler1:=handler.NewTranscodeHandler(*newffmpeg2,newffmpeg,publisher,MediaStrMgr)
 	// handler2:=handler1.NewTranscodeHandler()
 	mux.HandleFunc(queue.TypeTranscode,handler1.HandleTranscoding)
-	handler2:=handler.NewTHubnailHandler(publisher,newffmpeg1)
+	handler2:=handler.NewTHubnailHandler(publisher,newffmpeg1,MediaStrMgr,*newffmpeg3)
     mux.HandleFunc(queue.TypeThumbnail,handler2.HandleThumbnail)
 	smtpCfg := notify.ConfigSMTP{
 	Host:     os.Getenv("SMTP_HOST"),    

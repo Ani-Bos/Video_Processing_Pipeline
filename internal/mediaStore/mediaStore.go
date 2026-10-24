@@ -50,6 +50,7 @@ func(M *MediaStore)DownloadObject(ctx context.Context,key string,dest string)err
 func(M *MediaStore)PutDirObjects(ctx context.Context,key string,pref string)(error){
 	fmt.Println("entering into put objects wrapper for moving the hls format to put into bucket after transcoding and consume in thumbnai generation to prevent concurrency issue")
 	localfiles,err:=os.ReadDir(key)
+	fmt.Println("localfiles under this dir created by hls one byt thumbnail;", localfiles)
 	if err!=nil{
 		return err
 	}
@@ -58,6 +59,7 @@ func(M *MediaStore)PutDirObjects(ctx context.Context,key string,pref string)(err
 		continue
 	 }
 	 path:=filepath.Join(key,i.Name())
+	 fmt.Println("Each filepath under the directory is ",path)
 	 file,err:=os.Open(path)
 	 if err!=nil{
 		return nil
@@ -68,6 +70,7 @@ func(M *MediaStore)PutDirObjects(ctx context.Context,key string,pref string)(err
 		return err
 	 }
 	 prefixFilename:=pref+"/"+i.Name()
+	 fmt.Println("Prefixfilename for esch file ",prefixFilename)
      _,err=M.Client.PutObject(ctx,M.Bucket,prefixFilename,file,fileinfo.Size(),minio.PutObjectOptions{
 	})
 	file.Close()
@@ -90,6 +93,8 @@ func(M *MediaStore)DownloadHLSObject(ctx context.Context,key string, pref string
 	  }
 	  filename:=strings.TrimPrefix(i.Key,pref+"/")
 	  dest:=filepath.Join(key,filename)
+	  fmt.Println("filename in thubnail for downloadhls object is",filename)
+	  fmt.Println("dest in thumbnail for downloadhls obj is",dest)
 	  err=M.Client.FGetObject(ctx,M.Bucket,i.Key,dest,minio.GetObjectOptions{})
 	  if err!=nil{
 		return err
@@ -100,6 +105,7 @@ func(M *MediaStore)DownloadHLSObject(ctx context.Context,key string, pref string
 func(M *MediaStore)PutFileObject(ctx context.Context,key string,dest string)(error){
 	fmt.Println("Entering into putting the output thubnail image in the minio bucket")
 	file,err:=os.Open(dest)
+	fmt.Println("Putting the thumbnail image in the file locn",file)
 	if err!=nil{
 		return err
 	}
@@ -108,6 +114,7 @@ func(M *MediaStore)PutFileObject(ctx context.Context,key string,dest string)(err
 	if err!=nil{
 		return err
 	}
+	fmt.Println("stat info of the file is",fileinfo)
 	_,err=M.Client.PutObject(ctx,M.Bucket,key,file,fileinfo.Size(),minio.PutObjectOptions{})
 	if err!=nil{
 		return err
