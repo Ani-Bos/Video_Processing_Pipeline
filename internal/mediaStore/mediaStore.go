@@ -62,7 +62,7 @@ func(M *MediaStore)PutDirObjects(ctx context.Context,key string,pref string)(err
 	 fmt.Println("Each filepath under the directory is ",path)
 	 file,err:=os.Open(path)
 	 if err!=nil{
-		return nil
+		return err
 	 }
 	 fileinfo,err:=file.Stat()
 	 if err!=nil{

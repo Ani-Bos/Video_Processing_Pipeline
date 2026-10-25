@@ -7,4 +7,5 @@ import (
 
 type TranscoderManager interface {
 	Transcode(ctx context.Context,job *queue.JobQueue)(error)
+	GenerateWav(ctx context.Context,src string, wavpath string)(error)
 }

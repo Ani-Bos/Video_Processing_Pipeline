@@ -29,10 +29,18 @@ CMD ["./upload"]
 FROM alpine:3.20 AS worker
 WORKDIR /app
 RUN apk add --no-cache ffmpeg ca-certificates libstdc++
-COPY --from=whisperworker /whisper/build/bin/whisper-cli /usr/local/bin/whisper-cli
+COPY --from=whisperworker /whisper/build /tmp/whisper-build
+RUN find /tmp/whisper-build -name 'lib*.so*' -exec cp -a {} /usr/local/lib/ \; \
+    && cp /tmp/whisper-build/bin/whisper-cli /usr/local/bin/whisper-cli \
+    && chmod +x /usr/local/bin/whisper-cli \
+    && rm -rf /tmp/whisper-build
 RUN mkdir -p /app/models
 COPY --from=whisperworker /whisper/models/ggml-small.bin /app/models/ggml-small.bin
 COPY --from=builder /out/worker .
 RUN chmod +x ./worker
+ENV LD_LIBRARY_PATH=/usr/local/lib
+ENV FFMPEG_BIN=ffmpeg
+ENV WHISPER_BIN=whisper-cli
+ENV MODEL_LOCATION=/app/models/ggml-small.bin
 ENV FFMPEG_BIN=ffmpeg
 CMD ["./worker"]

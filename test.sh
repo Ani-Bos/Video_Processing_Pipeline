@@ -1,13 +1,13 @@
 #!/bin/bash
 
-VIDEO="c:\\Users\\Aniket\\Documents\\1080_30_8.00_Jun222021(1).mp4"
+VIDEO="c:\\Users\\Aniket\\Downloads\\eng.mp3"
 CHUNK_SIZE=5242880
 
 split -d -b "$CHUNK_SIZE" "$VIDEO" /tmp/chunk_
 # chunk sIZE  5mb total size of video 27 mb chunks 6 chunks
 resp=$(curl -s -X POST http://localhost:8080/upload/init \
   -H "Content-Type: application/json" \
-  -d '{"filename":"c:\\Users\\Aniket\\Documents\\1080_30_8.00_Jun222021(1).mp4","total_size":28857413,"chunk_size":5242880}')
+  -d '{"filename":"c:\\Users\\Aniket\\Downloads\\eng.mp3","total_size":19722393,"chunk_size":5242880}')
 
 echo "Raw response: $resp"
 
@@ -19,7 +19,7 @@ if [ -z "$ID" ]; then
     exit 1
 fi
 
-for i in {0..5}; do
+for i in {0..3}; do
     CHUNK_FILE=$(printf "/tmp/chunk_%02d" $i)
     if [ -f "$CHUNK_FILE" ]; then
         echo "Uploading chunk $i..."

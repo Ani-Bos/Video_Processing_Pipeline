@@ -59,7 +59,7 @@ func(th *TranscodeHandler)HandleTranscoding(ctx context.Context, t *asynq.Task)e
 		return err
 	}
     //first extract the wav file using ffmpeg and then usign whisper model to transcribe speech to text
-	err=th.CaptionMgr.GenerateWav(ctx,localfile,audiowav)
+	err=th.trnscdr.GenerateWav(ctx,localfile,audiowav)
 	if err!=nil{
 		return err
 	}
